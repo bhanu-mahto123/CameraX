@@ -58,6 +58,7 @@ dependencies {
 
 
 
+    implementation 'com.squareup.picasso:picasso:2.5.2'
     // Dependencies for working with Architecture components
     // You'll probably have to update the version numbers in build.gradle (Project)
 
