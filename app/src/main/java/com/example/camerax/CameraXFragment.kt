@@ -1,14 +1,18 @@
 package com.example.camerax
 
+import android.R.attr.button
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
-import android.graphics.BitmapFactory
+import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
+import android.os.Handler
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
+import android.view.View.OnTouchListener
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Toast
@@ -17,9 +21,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.google.common.util.concurrent.ListenableFuture
+import com.squareup.picasso.Picasso
 import java.io.File
 import java.util.concurrent.Executors
+
 
 /**
  * A simple [Fragment] subclass.
@@ -36,9 +41,11 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
     private lateinit var outputDirectory: File
     private var camera: Camera? = null
 
+    var albumNum:Int?=null
+
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater, container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_camera_x, container, false)
@@ -58,14 +65,62 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
         return view
     }
 
+
+
     private fun startCamera() {
 
 
         configureCamera(activity?.baseContext!!)
 
-        ivCapture.setOnClickListener {
-            clickAndSavePhoto()
+        var mp = MediaPlayer.create(context, R.raw.camera_sound)
+
+//        ivCapture.setOnClickListener {
+//            clickAndSavePhoto(mp)
+//        }
+        var mHandler: Handler? = null
+        var mAction: Runnable = object : Runnable {
+            override fun run() {
+                clickAndSavePhoto(mp,albumNum!!)
+                mHandler!!.postDelayed(this, 500)
+            }
         }
+
+
+       ivCapture.setOnTouchListener(object : OnTouchListener {
+           val sharedPref = activity?.getPreferences(Context.MODE_PRIVATE)
+
+
+
+           @SuppressLint("ClickableViewAccessibility")
+           override fun onTouch(v: View, event: MotionEvent): Boolean {
+                when (event.action) {
+                           MotionEvent.ACTION_DOWN -> {
+                               albumNum = sharedPref?.getInt(getString(R.string.saved_album_key), resources.getInteger(R.integer.default_album_number))
+//                        if (mHandler != null) return true
+                         mHandler = Handler()
+                        Log.d("CameraX", "On TOuch Down Called")
+
+                        mHandler!!.removeCallbacks(mAction)
+                        mHandler!!.postDelayed(mAction, 300)
+                    }
+                    MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                        if (mHandler == null) return true
+                        Log.d("CameraX", "On TOuch Up Called")
+                        mAction.run()
+                        mHandler!!.removeCallbacks(mAction)
+                        mHandler = null
+                        albumNum = albumNum?.plus(1)
+
+                        with(sharedPref?.edit()!!) {
+                            putInt(getString(R.string.saved_album_key), albumNum!!)
+                            apply()
+                        }
+                    }
+                }
+                return true
+            }
+
+        })
 
     }
 
@@ -91,7 +146,7 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
                 camera = cameraProvider.bindToLifecycle(
                         this, cameraSelector, preview, imageCapture)
 
-            } catch(exc: Exception) {
+            } catch (exc: Exception) {
                 Log.e(TAG, "Use case binding failed", exc)
             }
 
@@ -100,8 +155,9 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
     }
 
 
-    private fun clickAndSavePhoto(){
-        val photoFile = File(outputDirectory,"${System.currentTimeMillis()}.jpg")
+    private fun clickAndSavePhoto(mp: MediaPlayer,albumNum: Int) {
+
+        val photoFile = File(outputDirectory, "${System.currentTimeMillis()}.jpg")
 
         val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
@@ -117,9 +173,13 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
                 activity?.runOnUiThread(Runnable {
                     val toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT)
                     toast.show()
-                    ivViewImage.setImageBitmap(BitmapFactory.decodeFile(photoFile.absolutePath))
+
+                    Picasso.with(context).load("file://" + photoFile.absolutePath).fit().into(ivViewImage)
+//                    ivViewImage.setImageBitmap(BitmapFactory.decodeFile(photoFile.absolutePath))
+                    mp.start()
                 })
-                viewModel.insertPhotos(Photo(photoFile.absolutePath,"Bitch","${System.currentTimeMillis()}"))
+                viewModel.insertPhotos(Photo(photoFile.absolutePath, "Album  ${albumNum.toString()}", "${System.currentTimeMillis()}"))
+
                 Log.d(TAG, msg)
             }
 

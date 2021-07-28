@@ -2,4 +2,6 @@
     <string name="app_name">CameraX</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <integer name="default_album_number">1</integer>
+    <string name="saved_album_key">SAVE_ALBUM_NUMBER</string>
 </resources>
