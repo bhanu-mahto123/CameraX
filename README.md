@@ -1,7 +1,7 @@
 
 
 # CameraX
-Sample Camera App using CameraX api to click multiple photo in one album with timestamp. 
+Sample Camera App using CameraX api to click multiple photo by holding shutter button and store in one album with timestamp. 
 HomeScreen displays all albums. While clicking photos preview is available which shows captured album.
 Full screen photo can be shown in albums on click by user.
 MVVM Pattern used. Room DB used.
