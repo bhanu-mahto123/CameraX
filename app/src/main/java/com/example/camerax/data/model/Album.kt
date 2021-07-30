@@ -1,4 +1,4 @@
-package com.example.camerax
+package com.example.camerax.data.model
 
 import androidx.room.ColumnInfo
 

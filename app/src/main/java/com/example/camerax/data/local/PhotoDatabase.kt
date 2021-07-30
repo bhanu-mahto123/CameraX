@@ -1,9 +1,11 @@
-package com.example.camerax
+package com.example.camerax.data.local
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.camerax.data.local.dao.PhotoDao
+import com.example.camerax.data.model.Photo
 
 @Database(entities = [Photo::class], version = 1, exportSchema = false)
 abstract class PhotoDatabase: RoomDatabase() {
@@ -16,6 +18,7 @@ abstract class PhotoDatabase: RoomDatabase() {
         fun getDatabase(context: Context): PhotoDatabase {
             // if the INSTANCE is not null, then return it,
             // if it is, then create the database
+
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
@@ -23,7 +26,6 @@ abstract class PhotoDatabase: RoomDatabase() {
                     "photo_database"
                 ).build()
                 INSTANCE = instance
-                // return instance
                 instance
             }
         }

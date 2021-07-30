@@ -1,11 +1,9 @@
-package com.example.camerax
+package com.example.camerax.view.ui
 
-import android.R.attr.button
 import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.media.MediaPlayer
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -21,17 +19,16 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import com.example.camerax.R
+import com.example.camerax.data.model.Photo
+import com.example.camerax.viewmodel.PhotoViewModel
 import com.squareup.picasso.Picasso
 import java.io.File
 import java.util.concurrent.Executors
 
 
-/**
- * A simple [Fragment] subclass.
- * Use the [CameraXFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
+
+class CameraXFragment(val viewModel: PhotoViewModel, val pListner: IPViewClick) : Fragment() {
 
     private lateinit var ivCapture: ImageView
     private lateinit var ivViewImage: ImageView
@@ -55,7 +52,15 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
         viewFinder = view.findViewById(R.id.viewFinder)
 
         ivViewImage.setOnClickListener {
+            var c = albumNum
+            if(c==null){
+                Toast.makeText(activity?.baseContext!!, "You should have some clicked photos. Anyway Let's Go to Albums Home Screen", Toast.LENGTH_SHORT).show()
+            }
             activity?.onBackPressed()
+            if(c!=null){
+                pListner.onPClicked("Album  ${c?.minus(1)}")
+            }
+
         }
 
         outputDirectory = getOutputDirectory(activity?.baseContext!!)
@@ -74,9 +79,6 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
 
         var mp = MediaPlayer.create(context, R.raw.camera_sound)
 
-//        ivCapture.setOnClickListener {
-//            clickAndSavePhoto(mp)
-//        }
         var mHandler: Handler? = null
         var mAction: Runnable = object : Runnable {
             override fun run() {
@@ -168,11 +170,11 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
             }
 
             override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                val savedUri = Uri.fromFile(photoFile)
-                val msg = "Photo capture succeeded: $savedUri"
+//                val savedUri = Uri.fromFile(photoFile)
+//                val msg = "Photo capture succeeded: $savedUri"
                 activity?.runOnUiThread(Runnable {
-                    val toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT)
-                    toast.show()
+//                    val toast = Toast.makeText(context, msg, Toast.LENGTH_SHORT)
+//                    toast.show()
 
                     Picasso.with(context).load("file://" + photoFile.absolutePath).fit().into(ivViewImage)
 //                    ivViewImage.setImageBitmap(BitmapFactory.decodeFile(photoFile.absolutePath))
@@ -180,7 +182,7 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
                 })
                 viewModel.insertPhotos(Photo(photoFile.absolutePath, "Album  ${albumNum.toString()}", "${System.currentTimeMillis()}"))
 
-                Log.d(TAG, msg)
+//                Log.d(TAG, msg)
             }
 
         })
@@ -197,4 +199,8 @@ class CameraXFragment(val viewModel: PhotoViewModel) : Fragment() {
     }
 
 
+}
+
+interface IPViewClick{
+    fun onPClicked(albumName: String)
 }

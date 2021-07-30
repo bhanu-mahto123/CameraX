@@ -1,4 +1,4 @@
-package com.example.camerax
+package com.example.camerax.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -10,6 +10,6 @@ data class Photo(@ColumnInfo(name="filepath")
             @ColumnInfo(name="album")
             val albumName: String,
             @ColumnInfo(name="date")
-            val dateTaken: String) {
+            val timeStamp: String) {
     @PrimaryKey(autoGenerate = true) var fileId = 0
 }

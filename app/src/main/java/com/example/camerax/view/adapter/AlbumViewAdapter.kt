@@ -1,7 +1,6 @@
 package com.example.camerax
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -9,11 +8,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.camerax.data.model.Album
 import com.squareup.picasso.Picasso
 
-class PhotoViewAdapter(val context: Context, val listner: IPhotoViewClick): RecyclerView.Adapter<PhotoViewAdapter.PhotoViewHolder>() {
+class AlbumViewAdapter(val context: Context, val listner: IPhotoViewClick): RecyclerView.Adapter<AlbumViewAdapter.PhotoViewHolder>() {
 
-    val allPhotos = ArrayList<Photo>()
     var allAlbums = ArrayList<Album>()
 
     inner class PhotoViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
@@ -25,7 +24,7 @@ class PhotoViewAdapter(val context: Context, val listner: IPhotoViewClick): Recy
         val viewHolder = PhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.item_photo,parent,false))
 
         viewHolder.imageView.setOnClickListener {
-            listner.onItemClicked(allAlbums[viewHolder.adapterPosition])
+            listner.onItemClicked(allAlbums[viewHolder.adapterPosition].album)
         }
 
         Log.d(TAG,"OnCreateViewHolder() ")
@@ -33,14 +32,14 @@ class PhotoViewAdapter(val context: Context, val listner: IPhotoViewClick): Recy
     }
 
     override fun onBindViewHolder(holder: PhotoViewHolder, position: Int) {
-//        val currentPhoto = allPhotos[position]
         val currentAlbum = allAlbums[position]
-//        holder.imageView.setImageBitmap(BitmapFactory.decodeFile(currentPhoto.flePath))
 
-//        Log.d(TAG,"BindViewHolder() ${allAlbums[0].filepath}")
 //        holder.imageView.setImageBitmap(BitmapFactory.decodeFile(currentAlbum.filepath))
+
         Picasso.with(context).load("file://" + currentAlbum.filepath).fit().into(holder.imageView)
+
         Log.d(TAG,"FilePath: ${currentAlbum.filepath}")
+
         holder.textView.visibility = View.VISIBLE
         holder.textView.text = currentAlbum.album
     }
@@ -48,13 +47,6 @@ class PhotoViewAdapter(val context: Context, val listner: IPhotoViewClick): Recy
     override fun getItemCount(): Int {
         Log.d(TAG,"getItemCount() ${allAlbums.size}")
         return allAlbums.size
-//        return allPhotos.size
-    }
-
-    fun updatePhotoList(newList: List<Photo>){
-        allPhotos.clear()
-        allPhotos.addAll(newList)
-        notifyDataSetChanged()
     }
 
     fun updateAlbumList(it: List<Album>) {
@@ -69,5 +61,5 @@ class PhotoViewAdapter(val context: Context, val listner: IPhotoViewClick): Recy
 }
 
 interface IPhotoViewClick{
-    fun onItemClicked(album: Album)
+    fun onItemClicked(albumName: String)
 }

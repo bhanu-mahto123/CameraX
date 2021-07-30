@@ -1,22 +1,26 @@
 package com.example.camerax
 
 import android.content.Context
-import android.graphics.BitmapFactory
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.camerax.data.model.Photo
 import com.squareup.picasso.Picasso
 
-class AlbumPhotoAdapter(val context: Context, val allPhotos: List<Photo>): RecyclerView.Adapter<AlbumPhotoAdapter.AlbumPhotoViewHolder>() {
+class AlbumPhotosAdapter(val context: Context, val allPhotos: List<Photo>, val aListener: AlbumListener): RecyclerView.Adapter<AlbumPhotosAdapter.AlbumPhotoViewHolder>() {
 
     inner class AlbumPhotoViewHolder(itemView: View): RecyclerView.ViewHolder(itemView){
         val imageView = itemView.findViewById<ImageView>(R.id.itemImage)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AlbumPhotoViewHolder {
-        return AlbumPhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.item_photo,parent,false))
+        val viewHolder = AlbumPhotoViewHolder(LayoutInflater.from(context).inflate(R.layout.item_photo,parent,false))
+        viewHolder.imageView.setOnClickListener {
+            aListener.onAlbumItemClicked(viewHolder.adapterPosition)
+        }
+        return viewHolder
     }
 
     override fun onBindViewHolder(holder: AlbumPhotoViewHolder, position: Int) {
@@ -30,4 +34,9 @@ class AlbumPhotoAdapter(val context: Context, val allPhotos: List<Photo>): Recyc
         return allPhotos.size
     }
 
+}
+
+
+interface AlbumListener{
+    fun onAlbumItemClicked(position: Int)
 }

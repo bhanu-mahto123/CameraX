@@ -1,9 +1,11 @@
-package com.example.camerax
+package com.example.camerax.data.local.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.camerax.data.model.Album
+import com.example.camerax.data.model.Photo
 
 @Dao
 interface PhotoDao {
@@ -14,8 +16,9 @@ interface PhotoDao {
     fun getAllPhotos(): LiveData<List<Photo>>
 
     @Query("Select Count(fileId), filepath, album from photo_table group by album order by fileId ASC")
-    fun getAllALbums(): LiveData<List<Album>>
+    fun getAllAlbums(): LiveData<List<Album>>
 
     @Query("Select * from photo_table where album Like :albumName")
-    suspend fun getAllPhotosinAlbum(albumName: String) : List<Photo>
+    suspend fun getAllPhotosInAlbum(albumName: String) : List<Photo>
+
 }

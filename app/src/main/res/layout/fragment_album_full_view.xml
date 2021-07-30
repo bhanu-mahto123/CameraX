@@ -4,13 +4,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    tools:context=".view.ui.AlbumPhotos">
+    tools:context=".view.ui.AlbumPhotoFullView">
 
-    <androidx.recyclerview.widget.RecyclerView
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:id="@+id/recyclerAlbumPhotoView"
-        android:layout_height="match_parent"
-        android:nestedScrollingEnabled="false"
-        tools:listitem="@layout/item_photo"/>
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

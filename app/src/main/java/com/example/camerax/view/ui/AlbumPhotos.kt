@@ -1,6 +1,5 @@
-package com.example.camerax
+package com.example.camerax.view.ui
 
-import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,15 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.camerax.AlbumListener
+import com.example.camerax.AlbumPhotosAdapter
+import com.example.camerax.R
+import com.example.camerax.data.model.Photo
 import kotlinx.android.synthetic.main.activity_main.*
 
 
 /**
  * A simple [Fragment] subclass.
- * Use the [AlbumPhoto.newInstance] factory method to
+ * Use the [AlbumPhotos.newInstance] factory method to
  * create an instance of this fragment.
  */
-class AlbumPhoto(val albumList: List<Photo>) : Fragment() {
+class AlbumPhotos(val albumList: List<Photo>, val albumListener: AlbumListener) : Fragment() {
 
     private lateinit var mRecyclerView: RecyclerView
 
@@ -26,7 +29,7 @@ class AlbumPhoto(val albumList: List<Photo>) : Fragment() {
         val context = activity?.baseContext!!
         val view: View =inflater.inflate(R.layout.fragment_album_photo, container, false)
         mRecyclerView = view.findViewById(R.id.recyclerAlbumPhotoView)
-        val adapter = AlbumPhotoAdapter(context,albumList)
+        val adapter = AlbumPhotosAdapter(context,albumList,albumListener)
         mRecyclerView.adapter = adapter
         mRecyclerView.layoutManager = GridLayoutManager(context,3)
         return view
